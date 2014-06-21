@@ -97,20 +97,21 @@ function get_mov_info ()
 function search ()
 {
 	#所谓id就是行号
-	lineNums=$(grep -on ${2} ${SNW_ROOT}/Total_utf8.xml | cut -d ':' -f 1)
+	lineNums=$(grep -on "${1}" "${SNW_ROOT}/Total_utf8.xml" | cut -d ':' -f 1)
 
 	echo ""
-	if [[ $lineNums = "" ]]; then
+	if [[ "${lineNums}" = "" ]]; then
 		echo "未找到视频"
 	else
-		printf " %5s | %-70s | %-35s\n" "ID" "片名" "类型"
-		echo "-------+----------------------------------------------------------------------+----------"
-		for id in $lineNums; do
+		echo " ID    | 片名                                               | 类型     | 集数"
+		echo "-------+----------------------------------------------------+----------+-------"
+		for id in ${lineNums}; do
 			#先转gbk再转utf-8, 不然不能对齐
-			movName=$(get_mov_info INFO_NAME ${id} | iconv if UTF-8 -t gbk)
-			movType=$(get_mov_info INFO_TYPE ${id})
-			printf " %5d |%-70s| " "${id}" "${movName}" | iconv -f gbk -t UTF-8
-			echo "${movType}"
+			movName=$(get_mov_info INFO_NAME ${id} | iconv -f UTF-8 -t gbk)
+			movType=$(get_mov_info INFO_TYPE ${id} | iconv -f UTF-8 -t gbk)
+			printf " %5d | %-50s | %-8s | " "${id}" "${movName}" "${movType}"| iconv -f gbk -t UTF-8
+#get_mov_info INFO_NUM ${id}
+			echo 10
 		done
 	fi
 }
@@ -223,7 +224,7 @@ refresh
 #判断命令
 case $1 in
 	"se" | "search")
-		search
+		search $2
 		;;
 	"play")
 		play
