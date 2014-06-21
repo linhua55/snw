@@ -102,7 +102,6 @@ function get_mov_info ()
 #参数1: 视频ID
 function search ()
 {
-	echo ${1} | wc -c
 	#没有关键词?
 	if (($# < 1)); then
 		error 3
