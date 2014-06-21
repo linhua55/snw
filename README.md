@@ -1,4 +1,4 @@
-# Sunny and No Window
+# Sunny No Window
 
 Linux下一个能从基于光音网视高校云视频服务搭建的校园视频网获取视频下载地址的工具
 
@@ -61,6 +61,10 @@ chmod +x ~/bin/snw ~/bin/snw-decode
 
 ```
 
+##许可证
+
+[GPLv2](https://www.gnu.org/licenses/gpl-2.0.html)
+
 ## 已知BUG
 
-当iconv转码错误时, 输出的表格对齐不对, 暂时误解, 谁要是知道解决方法麻烦告诉一声:weary:
+经当iconv转码错误时, 输出的表格对齐不对, 暂时误解, 谁要是知道解决方法麻烦告诉一声 :weary:

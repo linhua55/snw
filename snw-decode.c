@@ -1,3 +1,10 @@
+/*
+   Sunny No Window decode
+   许可证: GPLv2
+   作者: 蔡佳男
+   解密从从基于光音网视高校云视频服务搭建的校园视频网下载下来的视频的小工具
+   原理来自CampusNetworkVideoHunter https://github.com/sinsoul/CampusNetworkVideoHunter
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,11 +30,11 @@ int main (int argc, char *argv[])
 			int j;
 			for (j = 0; j < 160; ++j)
 			{
-				int8_t v;
-				fread (&v, sizeof (int8_t), 1, fp);
+				char v;
+				fread (&v, sizeof (char), 1, fp);
 				fseek (fp, -1L, SEEK_CUR);
 				v^=0xff;
-				fwrite (&v, sizeof (int8_t), 1, fp);
+				fwrite (&v, sizeof (char), 1, fp);
 			}
 			fclose (fp);
 		}
