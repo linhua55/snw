@@ -10,6 +10,8 @@
 ADDRESS="http://10.0.12.252"
 #视频信息xml存放位置
 SNW_ROOT="$HOME/.snw"
+#播放器
+PLAYER="smplayer"
 
 #错误提示
 ERROR_MSG[1]="无法获取视频列表"
@@ -133,15 +135,15 @@ function play ()
 
 	for ((i=0;i<videoNum;++i)); do
 		tmpLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=${i}&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
-		if [[ tmpLink = "" ]]; then
-			echo "${movName}第$(expr ${i} + 1)未提供下载"
+		if [[ "$tmpLink" = "" ]]; then
+			echo "${movName}第$(expr ${i} + 1)集 未提供下载"
 		else
 			videoLinks="${videoLinks} ${tmpLink}"
-			echo "${movName}第$(expr ${i} + 1)"
+			echo "${movName}第$(expr ${i} + 1)集"
 			echo "${tmpLink}"
 		fi
 	done
-	smplayer ${videoLinks}
+	${PLAYER} ${videoLinks}
 }
 
 #下载视频
@@ -227,7 +229,7 @@ case $1 in
 		search $2
 		;;
 	"play")
-		play
+		play $2
 		;;
 	"get")
 		get
