@@ -136,13 +136,13 @@ function play ()
 	#这个视频有几集
 	videoNum=$(get_mov_info ${1} INFO_NUM)
 
-	for ((i=0;i<videoNum;++i)); do
-		tmpLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=${i}&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
+	for ((i=1;i<=videoNum;++i)); do
+		tmpLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${i} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
 		if [[ "$tmpLink" = "" ]]; then
-			echo "${movName}第$(expr ${i} + 1)集 未提供下载"
+			echo "${movName}第${i}集 未提供下载"
 		else
 			videoLinks="${videoLinks} ${tmpLink}"
-			echo "${movName}第$(expr ${i} + 1)集"
+			echo "${movName}第${i}集"
 			echo "${tmpLink}"
 		fi
 	done
@@ -170,29 +170,29 @@ function get ()
 	if (($# > 1)); then
 		if (("${2}" == '-n')); then
 			shift 2
-			for id in $@; do
-				if ((id>0)) && ((id<=videoNum)); then
-					videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${id} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
+			for i in $@; do
+				if ((i>0)) && ((i<=videoNum)); then
+					videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${i} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
 					if [[ videoLink = "" ]]; then
-						echo "${movName}第${id}未提供下载"
+						echo "${movName}第${i}未提供下载"
 					else
-						wget ${videoLink} -O "${movName}第${id}集.${videoLink##*.}"
+						wget ${videoLink} -O "${movName}第${i}集.${videoLink##*.}"
 					fi
 				else
-					echo "无效集数: " ${id}
+					echo "无效集数: " ${i}
 				fi
 			done
 		else
 			error 6
 		fi
 	else
-		for ((i=0;i<videoNum;++i)); do
-			videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=${i}&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
+		for ((i=1;i<=videoNum;++i)); do
+			videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${i} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
 			echo $videoLink
 			if [[ ${videoLink} = "" ]]; then
-				echo "${movName}第$(expr ${i} + 1)未提供下载"
+				echo "${movName}第${i}未提供下载"
 			else
-				wget ${videoLink} -O "${movName}第$(expr ${i} + 1)集.${videoLink##*.}"
+				wget ${videoLink} -O "${movName}第${i}集.${videoLink##*.}"
 			fi
 		done
 	fi
