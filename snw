@@ -1,0 +1,37 @@
+#/bin/bash
+#Sunny No Window
+#Liscense: GPLv2
+
+#Linux下一个能从基于光音网视高校云视频服务搭建的校园视频网获取视频下载地址的工具
+
+#原理来自CampusNetworkVideoHunter https://github.com/sinsoul/CampusNetworkVideoHunter
+
+#校园网视频地址
+ADDRESS=""
+#视频信息xml存放位置
+SNW_ROOT=""
+
+#错误提示
+ERROR_MSG[1]="无法获取视频列表"
+
+#输出错误信息后结束
+function error ()
+{
+	echo "${ERROR_MSG[${1}]}"
+	exit ${1}
+}
+
+#下载Total.xml 即视频列表
+function refresh ()
+{
+	echo "刷新视频列表..."
+	wget $ADDRESS/mov/xml/Total.xml -NP $SNW_ROOT || error 1
+
+	#下载成功则将其编码转为UTF-8, 再将dos换行转为unix换行
+	iconv -c -f gb2312 -t UTF-8 $SNW_ROOT/Total.xml -o $SNY_ROOT/Total_utf8.xml
+	dos2unix $SNY_ROOT/Total_utf8.xml
+	#去除首行(xml声明和根节点标签开头<root>) 行尾(根节点标签结尾</root>) 防止用户输入无效ID
+	sed -i '1d;$d' $SNY_ROOT/Total_utf8.xml
+
+	echo "共有$(wc -l $SNY_ROOT/Total_utf8.xml | cut -d ' ' -f 1)部视频"
+}
