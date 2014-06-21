@@ -32,7 +32,8 @@ function error ()
 #下载Total.xml 即视频列表
 function refresh ()
 {
-	xmlMD5=$(md5sum "${SNW_ROOT}/Total.xml")
+	#没有那个文件会出错误信息, 藏起来
+	[ -f "${SNW_ROOT}/Total.xml" ] && xmlMD5=$(md5sum "${SNW_ROOT}/Total.xml")
 	#wget -N 判断时间比本地的新才下载 -P 路径 -T 超时时间 -t 重试次数
 	wget "${ADDRESS}/mov/xml/Total.xml" -T 20 -t 1 -NP "${SNW_ROOT}" &> /dev/null || error 1
 
@@ -41,7 +42,8 @@ function refresh ()
 		echo "转换视频列表..."
 		#下载成功则将其编码转为UTF-8, 再将dos换行转为unix换行
 		iconv -c -f gb2312 -t UTF-8 "${SNW_ROOT}/Total.xml" -o "${SNW_ROOT}/Total_utf8.xml"
-		dos2unix "${SNW_ROOT}/Total_utf8.xml"
+		#dos2unix信息不显示
+		dos2unix "${SNW_ROOT}/Total_utf8.xml" &> /dev/null
 		#去除首行(xml声明和根节点标签开头<root>) 行尾(根节点标签结尾</root>) 防止用户输入无效ID
 		sed -i '1d;$d' "${SNW_ROOT}/Total_utf8.xml"
 
