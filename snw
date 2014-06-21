@@ -112,6 +112,48 @@ function play ()
 	smplayer ${videoLinks}
 }
 
+#下载视频
+function get ()
+{
+	#xml里总共有几个视频
+	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
+	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
+		error 2
+	fi
+
+	#用于获取真是视频地址的Key
+	movKey=$(get_mov_info INFO_KEY "${1}")
+	movName=$(get_mov_info INFO_NAME "${1}")
+	#这个视频有几集
+	videoNum=$(get_mov_info INFO_NUM "${1}")
+
+	if (($# > 1)); then
+		if (("${2}" == '-n')); then
+			shift 2
+			for id in $@; do
+				videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${id} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
+				if [[ videoLink = "" ]]; then
+					echo "${movName}第${id}未提供下载"
+				else
+					wget videoLink -O "${movName}第${id}集${videoLink##*.}"
+				fi
+			done
+		fi
+	else
+		videoNum=$(get_mov_info (INFO_NUM, "${1}"))
+		for ((i=0;i<videoNum;++i)); do
+			videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=${i}&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
+			if [[ videoLink = "" ]]; then
+				echo "${movName}第$(expr ${i} + 1)未提供下载"
+			else
+				wget -O "${movName}第$(expr ${i} + 1)集${videoLink##*.}"
+			fi
+		done
+	fi
+
+	echo "下载完成"
+}
+
 #打印用法
 function usage ()
 {
