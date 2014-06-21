@@ -13,10 +13,13 @@ SNW_ROOT=""
 
 #错误提示
 ERROR_MSG[1]="无法获取视频列表"
+ERROR_MSG[2]="无此视频ID"
 
 #视频信息类型
 INFO_NAME=1
 INFO_TYPE=2
+INFO_KEY=3
+INFO_NUM=4
 
 #输出错误信息后结束
 function error ()
@@ -50,6 +53,12 @@ function get_mov_info ()
 		INFO_TYPE)
 			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<g\>).+(?=\</g\>)"
 			;;
+		INFO_KEY)
+			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<b\>).+(?=\</b\>)"
+			;;
+		INFO_NUM)
+			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<h\>).+(?=\</h\>)"
+			;;
 	esac
 }
 
@@ -73,6 +82,34 @@ function search ()
 			echo "${movType}"
 		done
 	fi
+}
+
+#播放视频
+function play ()
+{
+	#xml里总共有几个视频
+	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
+	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
+		error 2
+	fi
+
+	#用于获取真是视频地址的Key
+	movKey=$(get_mov_info INFO_KEY "${1}")
+	movName=$(get_mov_info INFO_NAME "${1}")
+	#这个视频有几集
+	videoNum=$(get_mov_info INFO_NUM "${1}")
+
+	for ((i=0;i<videoNum;++i)); do
+		tmpLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=${i}&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
+		if [[ tmpLink = "" ]]; then
+			echo "${movName}第$(expr ${i} + 1)未提供下载"
+		else
+			videoLinks="${videoLinks} ${tmpLink}"
+			echo "${movName}第$(expr ${i} + 1)"
+			echo "${tmpLink}"
+		fi
+	done
+	smplayer ${videoLinks}
 }
 
 #打印用法
