@@ -35,3 +35,35 @@ function refresh ()
 
 	echo "共有$(wc -l $SNY_ROOT/Total_utf8.xml | cut -d ' ' -f 1)部视频"
 }
+
+#打印用法
+function usage () {
+	echo " 用法:"
+	echo " snw <命令> [参数] <-命令选项> [选项值]"
+	echo ""
+	echo " 命令:"
+	echo "      search, se             根据名称搜索 [参数] 关键词"
+	echo "      infomation, info       电影信息 [参数] ID"
+	echo "      play                   播放视频 [参数] ID"
+	echo "      refresh, ref           刷新视频列表"
+	echo "      get [-n 第n集 ...]     使用wget下载视频 [参数] ID, -n指定下载 [选项值] 第n集"
+}
+
+#判断命令
+case $1 in
+	"ref" | "refresh")
+		refresh
+		;;
+	"se" | "search")
+		search
+		;;
+	"play")
+		play
+		;;
+	"get")
+		get
+		;;
+	"help" | *)
+		usage
+		;;
+esac
