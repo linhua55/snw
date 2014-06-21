@@ -16,17 +16,7 @@ PLAYER="smplayer"
 #错误提示
 ERROR_MSG[1]="无法获取视频列表"
 ERROR_MSG[2]="无此视频ID"
-
-#视频信息类型
-INFO_NAME=1
-INFO_TYPE=2
-INFO_KEY=3
-INFO_NUM=4
-INFO_ACTOR=5
-INFO_DIRECTOR=6
-INFO_COUNTRY=7
-INFO_SOURCE=8
-INFO_INTRODUCTION=9
+ERROR_MSG[3]="参数错误"
 
 #输出错误信息后结束
 function error ()
@@ -165,22 +155,29 @@ function get ()
 		if (("${2}" == '-n')); then
 			shift 2
 			for id in $@; do
-				videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${id} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
-				if [[ videoLink = "" ]]; then
-					echo "${movName}第${id}未提供下载"
+				if ((id>0)) && ((id<=videoNum)); then
+					videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${id} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
+					if [[ videoLink = "" ]]; then
+						echo "${movName}第${id}未提供下载"
+					else
+						wget ${videoLink} -O "${movName}第${id}集.${videoLink##*.}"
+					fi
 				else
-					wget videoLink -O "${movName}第${id}集${videoLink##*.}"
+					echo "无效集数: " ${id}
 				fi
 			done
+		else
+			usage
+			error 3
 		fi
 	else
-		videoNum=$(get_mov_info (INFO_NUM, "${1}"))
 		for ((i=0;i<videoNum;++i)); do
 			videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=${i}&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
-			if [[ videoLink = "" ]]; then
+			echo $videoLink
+			if [[ ${videoLink} = "" ]]; then
 				echo "${movName}第$(expr ${i} + 1)未提供下载"
 			else
-				wget -O "${movName}第$(expr ${i} + 1)集${videoLink##*.}"
+				wget ${videoLink} -O "${movName}第$(expr ${i} + 1)集.${videoLink##*.}"
 			fi
 		done
 	fi
@@ -232,7 +229,8 @@ case $1 in
 		play $2
 		;;
 	"get")
-		get
+		shift 1
+		get $@
 		;;
 	"help" | *)
 		usage
