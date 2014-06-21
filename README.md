@@ -1,27 +1,25 @@
-#Sunny and No Window
+# Sunny and No Window
 
 Linux下一个能从基于光音网视高校云视频服务搭建的校园视频网获取视频下载地址的工具
 
 原理来自[CampusNetworkVideoHunter](https://github.com/sinsoul/CampusNetworkVideoHunter)
 
-##使用方法
+## 使用方法
 
-```
 
- snw <命令> [参数] <-命令选项> [选项值]
+	 snw <命令> [参数] <-命令选项> [选项值]
+	
+	 命令:
+	      search, se             根据名称搜索 [参数] 关键词
+	      infomation, info       视频信息 [参数] ID
+	      play                   播放视频 [参数] ID
+	      get [-n 第n集 ...]      使用wget下载视频 [参数] ID, -n指定下载 [选项值] 第n集
+	      decode, dc             解密视频
 
- 命令:
-      search, se             根据名称搜索 [参数] 关键词
-      infomation, info       视频信息 [参数] ID
-      play                   播放视频 [参数] ID
-      get [-n 第n集 ...]      使用wget下载视频 [参数] ID, -n指定下载 [选项值] 第n集
-      decode, dc             解密视频
-
-```
 
 `snw`的decode是调用`snw-decode`
 
-##安装说明
+## 安装说明
 
 很简单, 只比将大象放进冰箱里多一个步骤
 
