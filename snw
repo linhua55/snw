@@ -14,6 +14,10 @@ SNW_ROOT=""
 #错误提示
 ERROR_MSG[1]="无法获取视频列表"
 
+#视频信息类型
+INFO_NAME=1
+INFO_TYPE=2
+
 #输出错误信息后结束
 function error ()
 {
@@ -36,8 +40,44 @@ function refresh ()
 	echo "共有$(wc -l $SNY_ROOT/Total_utf8.xml | cut -d ' ' -f 1)部视频"
 }
 
+#取视频信息
+function get_mov_info ()
+{
+	case ${1} in
+		INFO_NAME)
+			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<a\>).+(?=\</a\>)"
+			;;
+		INFO_TYPE)
+			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<g\>).+(?=\</g\>)"
+			;;
+	esac
+}
+
+#搜索视频
+function search ()
+{
+	#所谓id就是行号
+	lineNums=$(grep -on ${2} ${SNW_ROOT}/Total_utf8.xml | cut -d ':' -f 1)
+
+	echo ""
+	if [[ $lineNums = "" ]]; then
+		echo "未找到视频"
+	else
+		printf " %5s | %-70s | %-35s\n" "ID" "片名" "类型"
+		echo "-------+----------------------------------------------------------------------+----------"
+		for id in $lineNums; do
+			#先转gbk再转utf-8, 不然不能对齐
+			movName=$(get_mov_info INFO_NAME ${id} | iconv if UTF-8 -t gbk)
+			movType=$(get_mov_info INFO_TYPE ${id})
+			printf " %5d |%-70s| " "${id}" "${movName}" | iconv -f gbk -t UTF-8
+			echo "${movType}"
+		done
+	fi
+}
+
 #打印用法
-function usage () {
+function usage ()
+{
 	echo " 用法:"
 	echo " snw <命令> [参数] <-命令选项> [选项值]"
 	echo ""
