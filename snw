@@ -1,7 +1,7 @@
 #/bin/bash
 #Sunny No Window
 #Liscense: GPLv2
-
+#作者: 蔡佳男
 #Linux下一个能从基于光音网视高校云视频服务搭建的校园视频网获取视频下载地址的工具
 
 #原理来自CampusNetworkVideoHunter https://github.com/sinsoul/CampusNetworkVideoHunter
