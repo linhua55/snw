@@ -22,6 +22,7 @@ ERROR_MSG[5]="没有视频ID"
 ERROR_MSG[6]="无效选项, 请输入 'swn hel'查看帮助"
 
 #输出错误信息后结束
+#参数1:错误码
 function error ()
 {
 	echo "${ERROR_MSG[${1}]}"
@@ -49,12 +50,17 @@ function refresh ()
 }
 
 #取xml节点内容
+#参数1: 第几数
+#参数2: 节点名
 function get_xml_node ()
 {
 	sed -n "${1}p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<${2}\>).+(?=\</${2}\>)"
 }
 
 #取视频信息
+#参数1: 视频ID, 其实就是行号
+#参数2: 属性.
+#一开始当c的常量写了--! 阴差阳错成了这样, 第二个参数是字符串, 比方说INFO_NAME整个就是字符串
 function get_mov_info ()
 {
 	case ${2} in
@@ -91,10 +97,13 @@ function get_mov_info ()
 }
 
 #搜索视频
+#参数1: 视频ID
 function search ()
 {
+	#没有关键词?
 	if (($# < 1)); then
 		error 3
+	#关键词太短?
 	elif [[ $(echo ${1} | wc -m) < 5 ]]; then
 		error 4
 	fi
@@ -121,11 +130,15 @@ function search ()
 #播放视频
 function play ()
 {
+	#没给ID?
 	if (($# < 1)); then
 		error 5
 	fi
+
 	#xml里总共有几个视频
 	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
+
+	#是否为有效ID
 	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
 		error 2
 	fi
@@ -136,6 +149,7 @@ function play ()
 	#这个视频有几集
 	videoNum=$(get_mov_info ${1} INFO_NUM)
 
+	#循环取地址
 	for ((i=1;i<=videoNum;++i)); do
 		tmpLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${i} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
 		if [[ "$tmpLink" = "" ]]; then
@@ -152,11 +166,15 @@ function play ()
 #下载视频
 function get ()
 {
+	#没给ID???
 	if (($# < 1)); then
 		error 5
 	fi
+
 	#xml里总共有几个视频
 	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
+
+	#ID是否有效?
 	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
 		error 2
 	fi
@@ -167,8 +185,10 @@ function get ()
 	#这个视频有几集
 	videoNum=$(get_mov_info ${1} INFO_NUM)
 
+	#参数大于一个, 看看是否有选项-n
 	if (($# > 1)); then
 		if (("${2}" == '-n')); then
+			#过掉ID 和-n
 			shift 2
 			for i in $@; do
 				if ((i>0)) && ((i<=videoNum)); then
@@ -186,6 +206,7 @@ function get ()
 			error 6
 		fi
 	else
+		#只有一个参数, 循环取地址
 		for ((i=1;i<=videoNum;++i)); do
 			videoLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=$(expr ${i} - 1)&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
 			echo $videoLink
