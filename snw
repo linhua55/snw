@@ -48,7 +48,7 @@ function refresh ()
 #取xml节点内容
 function get_xml_node ()
 {
-	sed -n "${1} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<${2}\>).+(?=\</${2}\>)"
+	sed -n "${1}p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<${2}\>).+(?=\</${2}\>)"
 }
 
 #取视频信息
@@ -68,19 +68,19 @@ function get_mov_info ()
 			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<h\>).+(?=\</h\>)"
 			;;
 		INFO_ACTOR)
-			get_mov_info "$2" 'd'
+			get_xml_node "$2" 'd'
 			;;
 		INFO_DIRECTOR)
-			get_mov_info "$2" 'c'
+			get_xml_node "$2" 'c'
 			;;
 		INFO_COUNTRY)
-			get_mov_info "$2" 'f'
+			get_xml_node "$2" 'f'
 			;;
 		INFO_SOURCE)
-			get_mov_info "$2" 'r'
+			get_xml_node "$2" 'r'
 			;;
 		INFO_INTRODUCTION)
-			get_mov_info "$2" 's'
+			get_xml_node "$2" 's'
 			;;
 	esac
 }
@@ -194,14 +194,14 @@ function info ()
 		error 2
 	fi
 
-	echo "片名: " "$(get_mov_info INFO_NAME $2)"
-	echo "类型: " "$(get_mov_info INFO_TYPE $2)"
-	echo "集数: " "$(get_mov_info INFO_NUM ${2})"
-	echo "演员: " "$(get_mov_info INFO_ACTOR${2})"
-	echo "导演: " "$(get_mov_info INFO_DIRECTOR${2})"
-	echo "国家: " "$(get_mov_info INFO_COUNTRY${2})"
-	echo "简介: " "$(get_mov_info INFO_SOURCE${2})"
-	echo "来源: " "$(get_mov_info INFO_INTRODUCTION${2})"
+	echo " 片名: " $(get_mov_info INFO_NAME ${1})
+	echo " 类型: " $(get_mov_info INFO_TYPE ${1})
+	echo " 集数: " $(get_mov_info INFO_NUM ${1})
+	echo " 演员: " $(get_mov_info INFO_ACTOR ${1})
+	echo " 导演: " $(get_mov_info INFO_DIRECTOR ${1})
+	echo " 国家: " $(get_mov_info INFO_COUNTRY ${1})
+	echo " 简介: " $(get_mov_info INFO_SOURCE ${1})
+	echo " 来源: " $(get_mov_info INFO_INTRODUCTION ${1})
 }
 
 #打印用法
@@ -231,6 +231,9 @@ case $1 in
 	"get")
 		shift 1
 		get $@
+		;;
+	"info")
+		info $2
 		;;
 	"help" | *)
 		usage
