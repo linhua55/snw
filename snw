@@ -57,34 +57,36 @@ function get_xml_node ()
 #取视频信息
 function get_mov_info ()
 {
-	case ${1} in
+	case ${2} in
 		INFO_NAME)
-			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<a\>).+(?=\</a\>)"
+			get_xml_node "${1}" 'a'
 			;;
 		INFO_TYPE)
-			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<g\>).+(?=\</g\>)"
+			get_xml_node "${1}" 'g'
 			;;
 		INFO_KEY)
-			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<b\>).+(?=\</b\>)"
+			get_xml_node "${1}" 'b'
 			;;
 		INFO_NUM)
-			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<h\>).+(?=\</h\>)"
+			get_xml_node "${1}" 'h'
 			;;
 		INFO_ACTOR)
-			get_xml_node "$2" 'd'
+			get_xml_node "${1}" 'd'
 			;;
 		INFO_DIRECTOR)
-			get_xml_node "$2" 'c'
+			get_xml_node "${1}" 'c'
 			;;
 		INFO_COUNTRY)
-			get_xml_node "$2" 'f'
+			get_xml_node "${1}" 'f'
 			;;
 		INFO_SOURCE)
-			get_xml_node "$2" 'r'
+			get_xml_node "${1}" 'r'
 			;;
 		INFO_INTRODUCTION)
-			get_xml_node "$2" 's'
+			get_xml_node "${1}" 's'
 			;;
+		*)
+			echo "无效属性"
 	esac
 }
 
@@ -108,11 +110,10 @@ function search ()
 		echo "-------+----------------------------------------------------+----------+-------"
 		for id in ${lineNums}; do
 			#先转gbk再转utf-8, 不然不能对齐
-			movName=$(get_mov_info INFO_NAME ${id} | iconv -f UTF-8 -t gbk)
-			movType=$(get_mov_info INFO_TYPE ${id} | iconv -f UTF-8 -t gbk)
+			movName=$(get_mov_info ${id} INFO_NAME | iconv -f UTF-8 -t gbk)
+			movType=$(get_mov_info ${id} INFO_TYPE | iconv -f UTF-8 -t gbk)
 			printf " %5d | %-50s | %-8s | " "${id}" "${movName}" "${movType}"| iconv -f gbk -t UTF-8
-#get_mov_info INFO_NUM ${id}
-			echo 10
+			get_mov_info ${id} INFO_NUM
 		done
 	fi
 }
@@ -130,10 +131,10 @@ function play ()
 	fi
 
 	#用于获取真是视频地址的Key
-	movKey=$(get_mov_info INFO_KEY "${1}")
-	movName=$(get_mov_info INFO_NAME "${1}")
+	movKey=$(get_mov_info ${1} INFO_KEY)
+	movName=$(get_mov_info ${1} INFO_NAME)
 	#这个视频有几集
-	videoNum=$(get_mov_info INFO_NUM "${1}")
+	videoNum=$(get_mov_info ${1} INFO_NUM)
 
 	for ((i=0;i<videoNum;++i)); do
 		tmpLink=$(wget -qO- "${ADDRESS}/xy_new.asp?a=${i}&b=$movKey" |& grep -oP "(?<=\|\|\|).+(?=\|\|\|)")
@@ -161,10 +162,10 @@ function get ()
 	fi
 
 	#用于获取真是视频地址的Key
-	movKey=$(get_mov_info INFO_KEY "${1}")
-	movName=$(get_mov_info INFO_NAME "${1}")
+	movKey=$(get_mov_info ${1} INFO_KEY)
+	movName=$(get_mov_info ${1} INFO_NAME)
 	#这个视频有几集
-	videoNum=$(get_mov_info INFO_NUM "${1}")
+	videoNum=$(get_mov_info ${1} INFO_NUM)
 
 	if (($# > 1)); then
 		if (("${2}" == '-n')); then
@@ -211,14 +212,14 @@ function info ()
 		error 2
 	fi
 
-	echo " 片名: " $(get_mov_info INFO_NAME ${1})
-	echo " 类型: " $(get_mov_info INFO_TYPE ${1})
-	echo " 集数: " $(get_mov_info INFO_NUM ${1})
-	echo " 演员: " $(get_mov_info INFO_ACTOR ${1})
-	echo " 导演: " $(get_mov_info INFO_DIRECTOR ${1})
-	echo " 国家: " $(get_mov_info INFO_COUNTRY ${1})
-	echo " 简介: " $(get_mov_info INFO_SOURCE ${1})
-	echo " 来源: " $(get_mov_info INFO_INTRODUCTION ${1})
+	echo " 片名: " $(get_mov_info ${1} INFO_NAME)
+	echo " 类型: " $(get_mov_info ${1} INFO_TYPE)
+	echo " 集数: " $(get_mov_info ${1} INFO_NUM)
+	echo " 演员: " $(get_mov_info ${1} INFO_ACTOR)
+	echo " 导演: " $(get_mov_info ${1} INFO_DIRECTOR)
+	echo " 国家: " $(get_mov_info ${1} INFO_COUNTRY)
+	echo " 简介: " $(get_mov_info ${1} INFO_SOURCE)
+	echo " 来源: " $(get_mov_info ${1} INFO_INTRODUCTION)
 }
 
 #打印用法
