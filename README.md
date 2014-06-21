@@ -47,18 +47,18 @@ gcc snw-decode.c -o snw-decode
 
 ```
 
-3.为`snw`和`snw-decode`添加可执行属性
-
-```bash
-
-chmod +x snw snw-decode
-
-```
-
-4.将`snw`和`snw-decode`移动到你家里的`bin`下面
+3.将`snw`和`snw-decode`移动到你家里的`bin`下面
 
 ```bash
 
 cp snw snw-decode ~/bin
+
+```
+
+4.为`snw`和`snw-decode`添加可执行属性
+
+```bash
+
+chmod +x ~/bin/snw ~/bin/snw-decode
 
 ```
