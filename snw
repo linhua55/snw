@@ -254,6 +254,10 @@ case $1 in
 	"info")
 		info $2
 		;;
+	"dc" | "decode")
+		shift 1
+		snw-decode $@
+		;;
 	"help" | *)
 		usage
 		;;
