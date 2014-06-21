@@ -112,7 +112,7 @@ function search ()
 	fi
 
 	#所谓id就是行号
-	lineNums=$(grep -on "${1}" "${SNW_ROOT}/Total_utf8.xml" | cut -d ':' -f 1)
+	lineNums=$(grep -n "${1}" "${SNW_ROOT}/Total_utf8.xml" |sort -u | cut -d ':' -f 1)
 
 	echo ""
 	if [[ "${lineNums}" = "" ]]; then
