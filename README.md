@@ -60,3 +60,7 @@ cp snw snw-decode ~/bin
 chmod +x ~/bin/snw ~/bin/snw-decode
 
 ```
+
+## 已知BUG
+
+当iconv转码错误时, 输出的表格对齐不对, 暂时误解, 谁要是知道解决方法麻烦告诉一声:weary:
