@@ -7,9 +7,9 @@
 #原理来自CampusNetworkVideoHunter https://github.com/sinsoul/CampusNetworkVideoHunter
 
 #校园网视频地址
-ADDRESS=""
+ADDRESS="http://10.0.12.252"
 #视频信息xml存放位置
-SNW_ROOT=""
+SNW_ROOT="$HOME/.snw"
 
 #错误提示
 ERROR_MSG[1]="无法获取视频列表"
@@ -36,16 +36,21 @@ function error ()
 #下载Total.xml 即视频列表
 function refresh ()
 {
-	echo "刷新视频列表..."
-	wget $ADDRESS/mov/xml/Total.xml -NP $SNW_ROOT || error 1
+	xmlMD5=$(md5sum "${SNW_ROOT}/Total.xml")
+	#wget -N 判断时间比本地的新才下载 -P 路径 -T 超时时间 -t 重试次数
+	wget "${ADDRESS}/mov/xml/Total.xml" -T 20 -t 1 -NP "${SNW_ROOT}" &> /dev/null || error 1
 
-	#下载成功则将其编码转为UTF-8, 再将dos换行转为unix换行
-	iconv -c -f gb2312 -t UTF-8 $SNW_ROOT/Total.xml -o $SNY_ROOT/Total_utf8.xml
-	dos2unix $SNY_ROOT/Total_utf8.xml
-	#去除首行(xml声明和根节点标签开头<root>) 行尾(根节点标签结尾</root>) 防止用户输入无效ID
-	sed -i '1d;$d' $SNY_ROOT/Total_utf8.xml
+	#用MD5码是否变化判断xml是否更新了
+	if [[ "${xmlMD5}" != $(md5sum "${SNW_ROOT}/Total.xml") ]]; then
+		echo "转换视频列表..."
+		#下载成功则将其编码转为UTF-8, 再将dos换行转为unix换行
+		iconv -c -f gb2312 -t UTF-8 "${SNW_ROOT}/Total.xml" -o "${SNW_ROOT}/Total_utf8.xml"
+		dos2unix "${SNW_ROOT}/Total_utf8.xml"
+		#去除首行(xml声明和根节点标签开头<root>) 行尾(根节点标签结尾</root>) 防止用户输入无效ID
+		sed -i '1d;$d' "${SNW_ROOT}/Total_utf8.xml"
 
-	echo "共有$(wc -l $SNY_ROOT/Total_utf8.xml | cut -d ' ' -f 1)部视频"
+		echo "共有$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)部视频"
+	fi
 }
 
 #取xml节点内容
@@ -209,15 +214,14 @@ function usage ()
 	echo "      search, se             根据名称搜索 [参数] 关键词"
 	echo "      infomation, info       电影信息 [参数] ID"
 	echo "      play                   播放视频 [参数] ID"
-	echo "      refresh, ref           刷新视频列表"
 	echo "      get [-n 第n集 ...]     使用wget下载视频 [参数] ID, -n指定下载 [选项值] 第n集"
 }
 
+#自动刷新 不用就不会下载
+refresh 
+
 #判断命令
 case $1 in
-	"ref" | "refresh")
-		refresh
-		;;
 	"se" | "search")
 		search
 		;;
