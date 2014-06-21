@@ -20,6 +20,11 @@ INFO_NAME=1
 INFO_TYPE=2
 INFO_KEY=3
 INFO_NUM=4
+INFO_ACTOR=5
+INFO_DIRECTOR=6
+INFO_COUNTRY=7
+INFO_SOURCE=8
+INFO_INTRODUCTION=9
 
 #输出错误信息后结束
 function error ()
@@ -43,6 +48,12 @@ function refresh ()
 	echo "共有$(wc -l $SNY_ROOT/Total_utf8.xml | cut -d ' ' -f 1)部视频"
 }
 
+#取xml节点内容
+function get_xml_node ()
+{
+	sed -n "${1} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<${2}\>).+(?=\</${2}\>)"
+}
+
 #取视频信息
 function get_mov_info ()
 {
@@ -58,6 +69,21 @@ function get_mov_info ()
 			;;
 		INFO_NUM)
 			sed -n "${2} p" "${SNW_ROOT}/Total_utf8.xml" | grep -Po "(?<=\<h\>).+(?=\</h\>)"
+			;;
+		INFO_ACTOR)
+			get_mov_info "$2" 'd'
+			;;
+		INFO_DIRECTOR)
+			get_mov_info "$2" 'c'
+			;;
+		INFO_COUNTRY)
+			get_mov_info "$2" 'f'
+			;;
+		INFO_SOURCE)
+			get_mov_info "$2" 'r'
+			;;
+		INFO_INTRODUCTION)
+			get_mov_info "$2" 's'
 			;;
 	esac
 }
@@ -152,6 +178,25 @@ function get ()
 	fi
 
 	echo "下载完成"
+}
+
+#打印视频信息
+function info ()
+{
+	#xml里总共有几个视频
+	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
+	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
+		error 2
+	fi
+
+	echo "片名: " "$(get_mov_info INFO_NAME $2)"
+	echo "类型: " "$(get_mov_info INFO_TYPE $2)"
+	echo "集数: " "$(get_mov_info INFO_NUM ${2})"
+	echo "演员: " "$(get_mov_info INFO_ACTOR${2})"
+	echo "导演: " "$(get_mov_info INFO_DIRECTOR${2})"
+	echo "国家: " "$(get_mov_info INFO_COUNTRY${2})"
+	echo "简介: " "$(get_mov_info INFO_SOURCE${2})"
+	echo "来源: " "$(get_mov_info INFO_INTRODUCTION${2})"
 }
 
 #打印用法
