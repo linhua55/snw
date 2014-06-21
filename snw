@@ -16,7 +16,10 @@ PLAYER="smplayer"
 #错误提示
 ERROR_MSG[1]="无法获取视频列表"
 ERROR_MSG[2]="无此视频ID"
-ERROR_MSG[3]="参数错误"
+ERROR_MSG[3]="没有关键字"
+ERROR_MSG[4]="关键字太短"
+ERROR_MSG[5]="没有视频ID"
+ERROR_MSG[6]="无效选项, 请输入 'swn hel'查看帮助"
 
 #输出错误信息后结束
 function error ()
@@ -88,6 +91,12 @@ function get_mov_info ()
 #搜索视频
 function search ()
 {
+	if (($# < 1)); then
+		error 3
+	elif [[ $(echo ${1} | wc -m) < 5 ]]; then
+		error 4
+	fi
+
 	#所谓id就是行号
 	lineNums=$(grep -on "${1}" "${SNW_ROOT}/Total_utf8.xml" | cut -d ':' -f 1)
 
@@ -111,6 +120,9 @@ function search ()
 #播放视频
 function play ()
 {
+	if (($# < 1)); then
+		error 5
+	fi
 	#xml里总共有几个视频
 	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
 	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
@@ -139,6 +151,9 @@ function play ()
 #下载视频
 function get ()
 {
+	if (($# < 1)); then
+		error 5
+	fi
 	#xml里总共有几个视频
 	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
 	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
@@ -167,8 +182,7 @@ function get ()
 				fi
 			done
 		else
-			usage
-			error 3
+			error 6
 		fi
 	else
 		for ((i=0;i<videoNum;++i)); do
@@ -188,6 +202,9 @@ function get ()
 #打印视频信息
 function info ()
 {
+	if (($# < 1)); then
+		error 5
+	fi
 	#xml里总共有几个视频
 	movTotal=$(wc -l "${SNW_ROOT}/Total_utf8.xml" | cut -d ' ' -f 1)
 	if (("${1}" <= 0)) || (("$1" > "$movTotal")); then
@@ -217,6 +234,7 @@ function usage ()
 	echo "      get [-n 第n集 ...]     使用wget下载视频 [参数] ID, -n指定下载 [选项值] 第n集"
 }
 
+###########################  主程序  ##################################
 #自动刷新 不用就不会下载
 refresh 
 
