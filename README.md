@@ -1,6 +1,6 @@
 # Sunny No Window
 
-Linux下一个能从基于光音网视高校云视频服务搭建的校园视频网获取视频下载地址的工具
+Linux下一个有着傻X名字, 能从基于光音网视高校云视频服务搭建的校园视频网下载视频的工具
 
 原理来自[CampusNetworkVideoHunter](https://github.com/sinsoul/CampusNetworkVideoHunter)
 
@@ -12,7 +12,7 @@ Linux下一个能从基于光音网视高校云视频服务搭建的校园视频
 	 命令:
 	      search, se             根据名称搜索 [参数] 关键词
 	      infomation, info       视频信息 [参数] ID
-	      play                   播放视频 [参数] ID
+	      play                   播放视频 [参数] ID --只是个花瓶
 	      get [-n 第n集 ...]      使用wget下载视频 [参数] ID, -n指定下载 [选项值] 第n集
 	      decode, dc             解密视频
 
