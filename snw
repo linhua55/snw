@@ -253,7 +253,7 @@ function usage ()
 	echo ""
 	echo " 命令:"
 	echo "      search, se             根据名称搜索 [参数] 关键词"
-	echo "      infomation, info       电影信息 [参数] ID"
+	echo "      infomation, info       视频信息 [参数] ID"
 	echo "      play                   播放视频 [参数] ID"
 	echo "      get [-n 第n集 ...]     使用wget下载视频 [参数] ID, -n指定下载 [选项值] 第n集"
 	echo "      decode, dc             解密视频"
